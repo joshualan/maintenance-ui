@@ -1,5 +1,5 @@
 {
-  "name": "barebones-react-app-2021",
+  "name": "maintenance-ui",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,10 +13,23 @@
   "devDependencies": {
     "eslint": "^7.18.0",
     "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-react": "^7.23.2",
     "parcel": "^1.12.3",
     "prettier": "^2.3.0"
   },
   "dependencies": {
+    "@progress/kendo-data-query": "^1.5.5",
+    "@progress/kendo-drawing": "^1.10.1",
+    "@progress/kendo-licensing": "^1.1.4",
+    "@progress/kendo-react-animation": "^4.6.0",
+    "@progress/kendo-react-data-tools": "^4.6.0",
+    "@progress/kendo-react-dateinputs": "^4.6.0",
+    "@progress/kendo-react-dropdowns": "^4.6.0",
+    "@progress/kendo-react-grid": "^4.6.0",
+    "@progress/kendo-react-inputs": "^4.6.0",
+    "@progress/kendo-react-intl": "^4.6.0",
+    "@progress/kendo-react-treeview": "^4.6.0",
+    "@progress/kendo-theme-material": "^3.33.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },
