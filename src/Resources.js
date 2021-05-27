@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Grid, GridColumn } from "@progress/kendo-react-grid";
-import "@progress/kendo-theme-material/dist/all.css";
 
-const DeviceGrid = () => {
+import ResourceGrid from "./ResourceGrid";
+
+const Resources = () => {
   const [tenant, setTenant] = useState("");
   const [tenantsList, setTenantsList] = useState([]);
   const [site, setSite] = useState("");
@@ -93,13 +93,9 @@ const DeviceGrid = () => {
         </label>
       </form>
 
-      <Grid data={resources}>
-        <GridColumn field="DisplayName" title="Display Name" />
-        <GridColumn field="ResourceID" title="Resource ID" />
-        <GridColumn field="DefaultIPAddress" title="IP Address" />
-      </Grid>
+      <ResourceGrid resources={resources}></ResourceGrid>
     </div>
   );
 };
 
-export default DeviceGrid;
+export default Resources;
