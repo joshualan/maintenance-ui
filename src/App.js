@@ -1,17 +1,30 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
 
 import Resources from "./Resources";
-
-// import { Grid, GridColumn } from "@progress/kendo-react-grid";
+import ResourceDetails from "./ResourceDetails";
 
 const App = () => {
   return (
     <div>
-      <h1>WUG Resource List</h1>
-      <Resources></Resources>
+      <Router>
+        <header>
+          <Link to="/">
+            <h1>WUG Resource List</h1>
+          </Link>
+        </header>
+        <Switch>
+          <Route path="/details/:tenantID/:siteID/:resourceID">
+            <ResourceDetails />
+          </Route>
+          <Route path="/">
+            <Resources></Resources>
+          </Route>
+        </Switch>
+      </Router>
     </div>
   );
 };
 
-ReactDOM.render(React.createElement(App), document.getElementById("root"));
+ReactDOM.render(<App />, document.getElementById("root"));
