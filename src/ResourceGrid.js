@@ -57,8 +57,6 @@ const ResourceGrid = (props) => {
     setResult(process(resources, event.dataState));
   };
 
-  console.log(resources);
-
   return (
     <Grid
       data={result}
