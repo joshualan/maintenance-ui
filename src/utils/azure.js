@@ -6,7 +6,7 @@ async function getTenantsAndSites() {
 
   const json = await res.json();
   return json;
-};
+}
 
 async function getResources(tenantID, siteID) {
   const res = await fetch(
@@ -16,7 +16,7 @@ async function getResources(tenantID, siteID) {
 
   const json = await res.json();
   return json;
-};
+}
 
 async function updateMaintenanceStatus(tenantID, siteID, resourceID, status) {
   const res = await fetch(
@@ -49,4 +49,10 @@ async function getResourceInfo(tenantID, siteID, resourceID) {
   return json;
 }
 
-export { getTenantsAndSites, getResources, updateMaintenanceStatus, getMonitorsForResource, getResourceInfo };
+export {
+  getTenantsAndSites,
+  getResources,
+  updateMaintenanceStatus,
+  getMonitorsForResource,
+  getResourceInfo,
+};

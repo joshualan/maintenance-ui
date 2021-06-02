@@ -21,7 +21,12 @@ const MaintenanceCell = (props) => {
     const status =
       dataItem.WorstStateInternalID === 2 && dataItem.BestStateInternalID === 2;
 
-    const json = await updateMaintenanceStatus(TenantID, SiteID, ResourceID, !status);
+    const json = await updateMaintenanceStatus(
+      TenantID,
+      SiteID,
+      ResourceID,
+      !status
+    );
 
     if (json.data.success) {
       alert("Maintenance Status is now: " + !status);

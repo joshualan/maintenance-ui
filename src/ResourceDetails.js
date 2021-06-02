@@ -10,10 +10,13 @@ const MonitorStatusCell = (props) => {
   const { dataItem } = props;
   const { MonitorInternalStateID } = dataItem;
 
-
   return (
     <td>
-      {MonitorInternalStateID === 3 ? "❌" : MonitorInternalStateID === 2 ? "🛠️" : "✔️"}
+      {MonitorInternalStateID === 3
+        ? "❌"
+        : MonitorInternalStateID === 2
+        ? "🛠️"
+        : "✔️"}
     </td>
   );
 };
