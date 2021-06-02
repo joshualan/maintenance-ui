@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { getMonitorsForResource, getMonitorsForSite } from "./utils/azure";
+import {
+  getMonitorsForResource,
+  getMonitorsForSite,
+  addMonitorToResource,
+} from "./utils/azure";
 import { Grid, GridColumn } from "@progress/kendo-react-grid";
 import { process } from "@progress/kendo-data-query";
 
@@ -8,6 +12,56 @@ const AddMonitor = (props) => {
   const { TenantID, SiteID, id: ResourceID } = resource;
   const [siteMonitors, setSiteMonitors] = useState([]);
   const [dataState, setDataState] = useState({});
+
+  // CommandCell for adding a button to assign a new monitor
+  const CommandCell = (props) => {
+    const { dataItem, rowType } = props;
+    const [disabled, setDisabled] = useState(false);
+
+    // if you don't do this, the groupHeader row gets an "Add" button lmao
+    if (rowType === "groupHeader") {
+      return null;
+    }
+
+    async function assignMonitorToResource(dataItem) {
+      if (
+        window.confirm(
+          `Are you sure you want to assign ${dataItem.MonitorName} to ${resource.DisplayName}?`
+        )
+      ) {
+        const json = await addMonitorToResource(
+          TenantID,
+          SiteID,
+          ResourceID,
+          dataItem
+        );
+
+        if (json.data.successful === 1) {
+          setDisabled(true);
+          setTimeout(() => {
+            requestMonitors();
+          }, 5000);
+          alert(
+            `${dataItem.MonitorName} was successfully assigned to ${resource.DisplayName}.`
+          );
+        } else {
+          alert(`An error occurred`);
+        }
+      }
+    }
+
+    return (
+      <td>
+        <button
+          className="k-button k-primary"
+          onClick={() => assignMonitorToResource(dataItem)}
+          disabled={disabled}
+        >
+          Add
+        </button>
+      </td>
+    );
+  };
 
   // Boilerplate for the Kendo UI Grid
   const initialState = {
@@ -53,8 +107,11 @@ const AddMonitor = (props) => {
 
     const monitorIdSet = new Set();
 
-    monitorsForResource.forEach((element) => {
+    monitorsForResource["active"].forEach((element) => {
       monitorIdSet.add(element.ActiveMonitorCLSID);
+    });
+
+    monitorsForResource["statistical"].forEach((element) => {
       monitorIdSet.add(element.StatisticalMonitorCLSID);
     });
 
@@ -100,6 +157,7 @@ const AddMonitor = (props) => {
         <GridColumn field="Type" title="Type" />
         <GridColumn field="MonitorName" title="Monitor Name" />
         <GridColumn field="MonitorDescription" title="Monitor Description" />
+        <GridColumn field="id" title="Add" cell={CommandCell} width={150} />
       </Grid>
     </div>
   );

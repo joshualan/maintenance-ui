@@ -37,15 +37,27 @@ const ResourceDetails = () => {
 
   const toggleAddMonitorWindow = () => {
     setAddMonitorWindowVisibility(!addMonitorWindowVisibility);
+
+    // if we just toggled it off, grab new data.
+    if (!addMonitorWindowVisibility) {
+      requestMonitors();
+    }
   };
 
   async function requestMonitors() {
-    const monitorsForResource = await getMonitorsForResource(
-      tenantID,
-      siteID,
-      resourceID
-    );
-    setResourceMonitors(monitorsForResource);
+    const json = await getMonitorsForResource(tenantID, siteID, resourceID);
+    const monitors = [];
+
+    json["active"].forEach((element) => {
+      element.Type = "Active";
+      monitors.push(element);
+    });
+
+    json["statistical"].forEach((element) => {
+      element.Type = "Statistical";
+      monitors.push(element);
+    });
+    setResourceMonitors(monitors);
   }
 
   async function requestResource() {

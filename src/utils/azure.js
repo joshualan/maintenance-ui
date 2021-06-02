@@ -35,7 +35,7 @@ async function updateMaintenanceStatus(tenantID, siteID, resourceID, status) {
 
 async function getMonitorsForResource(tenantID, siteID, resourceID) {
   const res = await fetch(
-    `https://wugdeviceconfighandler.azurewebsites.net/api/ActiveMonitorAssignments/${tenantID}/${siteID}/${resourceID}?code=e4P0gJTxwgFifV2QPuqlSYsRp3DpbZOkKny6RkwOSBVxz2aNhJYkKA==`
+    `https://wugdeviceconfighandler.azurewebsites.net/api/Monitors/${tenantID}/${siteID}/${resourceID}?code=e4P0gJTxwgFifV2QPuqlSYsRp3DpbZOkKny6RkwOSBVxz2aNhJYkKA==`
   );
   const json = await res.json();
   return json;
@@ -57,6 +57,52 @@ async function getMonitorsForSite(tenantID, siteID) {
   return json;
 }
 
+async function addMonitorToResource(tenantID, siteID, resourceID, monitor) {
+  const {
+    ActiveMonitorTypeID,
+    ActiveMonitorCLSID,
+    StatisticalMonitorCLSID,
+    StatisticalMonitorTypeID,
+    MonitorName,
+  } = monitor;
+
+  const type = ActiveMonitorTypeID ? "active" : "performance";
+  const monitorTypeId = ActiveMonitorTypeID
+    ? ActiveMonitorTypeID
+    : StatisticalMonitorTypeID;
+  const monitorTypeClassId = ActiveMonitorCLSID
+    ? ActiveMonitorCLSID
+    : StatisticalMonitorCLSID;
+  const res = await fetch(
+    `http://nmapi.azure-api.net/wugapi/${tenantID}/${siteID}/api/v1/devices/${resourceID}/monitors/-`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        type: type,
+        monitorTypeId: monitorTypeId,
+        monitorTypeClassId: monitorTypeClassId,
+        monitorTypeName: MonitorName,
+        enabled: true,
+        isGlobal: true,
+        active: {
+          comment: "added from AE's UI",
+          argument: "",
+          interfaceId: "",
+          pollingIntervalSeconds: 0,
+          criticalOrder: 0,
+          actionPolicyId: "",
+          actionPolicyName: "",
+        },
+        performance: {
+          pollingIntervalMinutes: 1,
+        },
+      }),
+    }
+  );
+  const json = await res.json();
+  return json;
+}
+
 export {
   getTenantsAndSites,
   getResources,
@@ -64,4 +110,5 @@ export {
   getMonitorsForResource,
   getResourceInfo,
   getMonitorsForSite,
+  addMonitorToResource,
 };
