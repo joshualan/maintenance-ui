@@ -4,11 +4,12 @@ import { Grid, GridColumn } from "@progress/kendo-react-grid";
 import { process } from "@progress/kendo-data-query";
 
 const AddMonitor = (props) => {
-  const { tenantID, siteID, resourceID } = props;
-  const [resourceMonitors, setResourceMonitors] = useState([]);
+  const { resource } = props;
+  const { TenantID, SiteID, id: ResourceID } = resource;
   const [siteMonitors, setSiteMonitors] = useState([]);
   const [dataState, setDataState] = useState({});
 
+  // Boilerplate for the Kendo UI Grid
   const initialState = {
     group: [
       {
@@ -37,6 +38,7 @@ const AddMonitor = (props) => {
   useEffect(() => {
     setDataState(createAppState(initialState));
   }, [siteMonitors]);
+  // End of boilerplate for the Kendo UI Grid
 
   useEffect(() => {
     requestMonitors();
@@ -44,21 +46,35 @@ const AddMonitor = (props) => {
 
   async function requestMonitors() {
     const monitorsForResource = await getMonitorsForResource(
-      tenantID,
-      siteID,
-      resourceID
+      TenantID,
+      SiteID,
+      ResourceID
     );
-    setResourceMonitors(monitorsForResource);
 
-    const monitorsForSite = await getMonitorsForSite(tenantID, siteID);
+    const monitorIdSet = new Set();
+
+    monitorsForResource.forEach((element) => {
+      monitorIdSet.add(element.ActiveMonitorCLSID);
+      monitorIdSet.add(element.StatisticalMonitorCLSID);
+    });
+
+    const monitorsForSite = await getMonitorsForSite(TenantID, SiteID);
     const monitors = [];
 
     monitorsForSite["active"].forEach((element) => {
+      if (monitorIdSet.has(element.ActiveMonitorCLSID)) {
+        return;
+      }
+
       element.Type = "Active";
       monitors.push(element);
     });
 
     monitorsForSite["statistical"].forEach((element) => {
+      if (monitorIdSet.has(element.StatisticalMonitorCLSID)) {
+        return;
+      }
+
       element.Type = "Statistical";
       monitors.push(element);
     });
@@ -67,8 +83,8 @@ const AddMonitor = (props) => {
   }
 
   return (
-    <form title="Add Monitor">
-      {tenantID} {siteID} {resourceID}
+    <div>
+      {TenantID} {SiteID} {ResourceID}
       <Grid
         resizable={true}
         reorderable={true}
@@ -85,7 +101,7 @@ const AddMonitor = (props) => {
         <GridColumn field="MonitorName" title="Monitor Name" />
         <GridColumn field="MonitorDescription" title="Monitor Description" />
       </Grid>
-    </form>
+    </div>
   );
 };
 

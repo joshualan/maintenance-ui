@@ -2,13 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { Grid, GridColumn, GridToolbar } from "@progress/kendo-react-grid";
 import { Window } from "@progress/kendo-react-dialogs";
-import { process } from "@progress/kendo-data-query";
 
-import {
-  getMonitorsForResource,
-  getResourceInfo,
-  getMonitorsForSite,
-} from "./utils/azure";
+import { getMonitorsForResource, getResourceInfo } from "./utils/azure";
 import AddMonitor from "./AddMonitor";
 
 import "@progress/kendo-theme-material/dist/all.css";
@@ -69,11 +64,7 @@ const ResourceDetails = () => {
           initialHeight={1200}
           resizable={true}
         >
-          <AddMonitor
-            tenantID={tenantID}
-            siteID={siteID}
-            resourceID={resourceID}
-          />
+          <AddMonitor resource={resource} />
         </Window>
       )}
 
