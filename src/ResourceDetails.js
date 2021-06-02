@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { Grid, GridColumn, GridToolbar } from "@progress/kendo-react-grid";
+
+import { getMonitorsForResource, getResourceInfo } from "./utils/azure";
+
 import "@progress/kendo-theme-material/dist/all.css";
 
 const MonitorStatusCell = (props) => {
@@ -30,18 +33,12 @@ const ResourceDetails = () => {
   }
 
   async function requestMonitors() {
-    const res = await fetch(
-      `https://wugdeviceconfighandler.azurewebsites.net/api/ActiveMonitorAssignments/${tenantID}/${siteID}/${resourceID}?code=e4P0gJTxwgFifV2QPuqlSYsRp3DpbZOkKny6RkwOSBVxz2aNhJYkKA==`
-    );
-    const json = await res.json();
+    const json = await getMonitorsForResource(tenantID, siteID, resourceID);
     setMonitors(json);
   }
 
   async function requestResource() {
-    const res = await fetch(
-      `https://wugdeviceconfighandler.azurewebsites.net/api/Resources/${tenantID}/${siteID}/${resourceID}?code=TgqTODssOlYchgDd7CF9uhgwJ2OP6asPbOuO/Q5cZO1BLgV5od0Iww==`
-    );
-    const json = await res.json();
+    const json = await getResourceInfo(tenantID, siteID, resourceID);
     setResource(json[0]);
   }
 

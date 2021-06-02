@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { DropDownList } from "@progress/kendo-react-dropdowns";
 
 import ResourceGrid from "./ResourceGrid";
+import { getTenantsAndSites, getResources } from "./utils/azure";
 
 const Resources = () => {
   const [tenant, setTenant] = useState("");
@@ -20,12 +21,7 @@ const Resources = () => {
   }, [tenant]);
 
   async function requestTenants() {
-    const res = await fetch(
-      "https://tenantsandsites.azurewebsites.net/api/Sites?code=bmuHfXVJfQ8fDLmZFiN89e2/KdQc/rIpOT/6JctxQLLTfYcydER7SQ==",
-      { method: "GET", mode: "cors" }
-    );
-
-    const json = await res.json();
+    const json = await getTenantsAndSites();
     const m = {};
 
     json.forEach((s) => {
@@ -42,12 +38,7 @@ const Resources = () => {
       return;
     }
 
-    const res = await fetch(
-      `https://wugdeviceconfighandler.azurewebsites.net/api/Resources/${tenant}/${site}?code=ohoA9yF29wlnpmZi3rmxapSi06KMfA60/QAF/oLls6/xoaL3k1sK2A==`,
-      { method: "GET", mode: "cors" }
-    );
-
-    const json = await res.json();
+    const json = await getResources(tenant, site);
     setResources(json);
   }
 

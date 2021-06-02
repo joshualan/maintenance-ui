@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Grid, GridColumn } from "@progress/kendo-react-grid";
 import { process } from "@progress/kendo-data-query";
 import { Link } from "react-router-dom";
+import { updateMaintenanceStatus } from "./utils/azure";
 
 import "@progress/kendo-theme-material/dist/all.css";
 
@@ -19,18 +20,8 @@ const MaintenanceCell = (props) => {
     const { TenantID, SiteID, ResourceID } = dataItem;
     const status =
       dataItem.WorstStateInternalID === 2 && dataItem.BestStateInternalID === 2;
-    const res = await fetch(
-      `http://nmapi.azure-api.net/wugapi/${TenantID}/${SiteID}/api/v1/devices/${ResourceID}/config/maintenance`,
-      {
-        method: "PUT",
-        body: JSON.stringify({
-          enabled: !status,
-          reason: "some reason",
-        }),
-      }
-    );
 
-    const json = await res.json();
+    const json = await updateMaintenanceStatus(TenantID, SiteID, ResourceID, !status);
 
     if (json.data.success) {
       alert("Maintenance Status is now: " + !status);
