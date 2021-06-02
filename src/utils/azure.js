@@ -49,10 +49,19 @@ async function getResourceInfo(tenantID, siteID, resourceID) {
   return json;
 }
 
+async function getMonitorsForSite(tenantID, siteID) {
+  const res = await fetch(
+    `https://wugdeviceconfighandler.azurewebsites.net/api/Monitors/${tenantID}/${siteID}?code=x5s8KxcUkKmW1cKqSK8MICBYlvLD2r/Rexf8KCL0BKaBmaPwyzQKkw==`
+  );
+  const json = await res.json();
+  return json;
+}
+
 export {
   getTenantsAndSites,
   getResources,
   updateMaintenanceStatus,
   getMonitorsForResource,
   getResourceInfo,
+  getMonitorsForSite,
 };

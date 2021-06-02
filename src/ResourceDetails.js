@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { Grid, GridColumn, GridToolbar } from "@progress/kendo-react-grid";
+import { Window } from "@progress/kendo-react-dialogs";
+import { process } from "@progress/kendo-data-query";
 
-import { getMonitorsForResource, getResourceInfo } from "./utils/azure";
+import {
+  getMonitorsForResource,
+  getResourceInfo,
+  getMonitorsForSite,
+} from "./utils/azure";
+import AddMonitor from "./AddMonitor";
 
 import "@progress/kendo-theme-material/dist/all.css";
 
@@ -24,20 +31,26 @@ const MonitorStatusCell = (props) => {
 const ResourceDetails = () => {
   let { tenantID, siteID, resourceID } = useParams();
   const [resource, setResource] = useState({});
-  const [monitors, setMonitors] = useState([]);
+  const [resourceMonitors, setResourceMonitors] = useState([]);
+  const [addMonitorWindowVisibility, setAddMonitorWindowVisibility] =
+    useState(false);
 
   useEffect(() => {
     requestResource();
     requestMonitors();
   }, []);
 
-  async function addMonitorToResource() {
-    alert("You totally added a monitor dude");
-  }
+  const toggleAddMonitorWindow = () => {
+    setAddMonitorWindowVisibility(!addMonitorWindowVisibility);
+  };
 
   async function requestMonitors() {
-    const json = await getMonitorsForResource(tenantID, siteID, resourceID);
-    setMonitors(json);
+    const monitorsForResource = await getMonitorsForResource(
+      tenantID,
+      siteID,
+      resourceID
+    );
+    setResourceMonitors(monitorsForResource);
   }
 
   async function requestResource() {
@@ -47,6 +60,23 @@ const ResourceDetails = () => {
 
   return (
     <>
+      {addMonitorWindowVisibility && (
+        <Window
+          title="Add Monitor"
+          modal={true}
+          onClose={toggleAddMonitorWindow}
+          initialWidth={1500}
+          initialHeight={1200}
+          resizable={true}
+        >
+          <AddMonitor
+            tenantID={tenantID}
+            siteID={siteID}
+            resourceID={resourceID}
+          />
+        </Window>
+      )}
+
       <section
         style={{
           width: "20%",
@@ -64,18 +94,16 @@ const ResourceDetails = () => {
         ))}
       </section>
 
-      <Grid data={monitors}>
+      <Grid data={resourceMonitors}>
         <GridToolbar>
           <button
             title="Add Monitor"
             className="k-button k-primary"
-            onClick={addMonitorToResource}
+            onClick={toggleAddMonitorWindow}
           >
             Add Monitor
           </button>
         </GridToolbar>
-        <GridColumn field="ActiveMonitorID" title="Active Monitor ID" />
-        <GridColumn field="MonitorDisplayName" title="Monitor Display Name" />
         <GridColumn field="MonitorDisplayName" title="Monitor Display Name" />
         <GridColumn field="MonitorDescription" title="Monitor Description" />
         <GridColumn
