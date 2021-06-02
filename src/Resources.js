@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { DropDownList } from "@progress/kendo-react-dropdowns";
 
 import ResourceGrid from "./ResourceGrid";
 
@@ -50,47 +51,38 @@ const Resources = () => {
     setResources(json);
   }
 
+  const handleTenantChange = (event) => {
+    setTenant(event.target.value);
+  };
+
+  const handleSiteChange = (event) => {
+    setSite(event.target.value);
+  };
+
   return (
     <div className="search-params">
       <form
+        className="k-form"
         onSubmit={(e) => {
           e.preventDefault();
           requestResources();
         }}
       >
-        <label htmlFor="tenant">
-          Tenant
-          <select
-            id="tenant"
-            onChange={(e) => setTenant(e.target.value)}
-            onBlur={(e) => setTenant(e.target.value)}
-            value={tenant}
-          >
-            <option value=""></option>
-            {tenantsList.map((tenant) => (
-              <option value={tenant} key={tenant}>
-                {tenant}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label htmlFor="sites">
-          Site
-          <select
-            id="sites"
-            onChange={(e) => setSite(e.target.value)}
-            onBlur={(e) => setSite(e.target.value)}
-            value={site}
-          >
-            <option value=""></option>
-            {sitesList.map((site) => (
-              <option value={site} key={site}>
-                {site}
-              </option>
-            ))}
-          </select>
-          <button>Submit</button>
-        </label>
+        <DropDownList
+          label="Tenant"
+          name="tenant"
+          data={tenantsList}
+          required={true}
+          onChange={handleTenantChange}
+        />
+        <DropDownList
+          label="Site"
+          name="site"
+          data={sitesList}
+          required={true}
+          onChange={handleSiteChange}
+        />
+        <button className="k-button k-primary">Submit</button>
       </form>
 
       <ResourceGrid resources={resources}></ResourceGrid>

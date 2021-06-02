@@ -1,36 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { Grid, GridColumn } from "@progress/kendo-react-grid";
+import { Grid, GridColumn, GridToolbar } from "@progress/kendo-react-grid";
 import "@progress/kendo-theme-material/dist/all.css";
+
+const MonitorStatusCell = (props) => {
+  const { dataItem } = props;
+  const { MonitorInternalStateID } = dataItem;
+
+
+  return (
+    <td>
+      {MonitorInternalStateID === 3 ? "❌" : MonitorInternalStateID === 2 ? "🛠️" : "✔️"}
+    </td>
+  );
+};
 
 const ResourceDetails = () => {
   let { tenantID, siteID, resourceID } = useParams();
   const [resource, setResource] = useState({});
-  const [monitors, setMonitors] = useState([
-    {
-      ActiveMonitorID: 8,
-      ResourceID: 9,
-      MonitorDisplayName: "PANG",
-      MonitorDescription: "Test accessibility",
-      ActiveMonitorCLSID: "2655476e-36b0-455f-9cce-940b6f8e07bf",
-      ActiveMonitorTypeID: 2,
-      NetworkInterfaceID: 14,
-      Argument: "",
-      Comment: "",
-      LastStateChangeTimeLocal: "2021-06-01T15:57:20Z",
-      MonitorInternalStateID: 3,
-      MonitorDisabled: false,
-      CriticalMonitor: false,
-      id: "8",
-      TenantID: "whatsupgold",
-      SiteID: "atlmbarber02",
-    },
-  ]);
+  const [monitors, setMonitors] = useState([]);
 
   useEffect(() => {
     requestResource();
     requestMonitors();
   }, []);
+
+  async function addMonitorToResource() {
+    alert("You totally added a monitor dude");
+  }
 
   async function requestMonitors() {
     const res = await fetch(
@@ -52,7 +49,7 @@ const ResourceDetails = () => {
     <>
       <section
         style={{
-          width: "200px",
+          width: "20%",
           float: "left",
         }}
       >
@@ -68,6 +65,15 @@ const ResourceDetails = () => {
       </section>
 
       <Grid data={monitors}>
+        <GridToolbar>
+          <button
+            title="Add Monitor"
+            className="k-button k-primary"
+            onClick={addMonitorToResource}
+          >
+            Add Monitor
+          </button>
+        </GridToolbar>
         <GridColumn field="ActiveMonitorID" title="Active Monitor ID" />
         <GridColumn field="MonitorDisplayName" title="Monitor Display Name" />
         <GridColumn field="MonitorDisplayName" title="Monitor Display Name" />
@@ -75,6 +81,7 @@ const ResourceDetails = () => {
         <GridColumn
           field="MonitorInternalStateID"
           title="Monitor Internal State ID"
+          cell={MonitorStatusCell}
         />
       </Grid>
     </>

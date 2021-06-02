@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Grid, GridColumn } from "@progress/kendo-react-grid";
 import { process } from "@progress/kendo-data-query";
 import { Link } from "react-router-dom";
@@ -51,6 +51,10 @@ const ResourceGrid = (props) => {
   const { resources } = props;
   const [dataState, setDataState] = useState({});
   const [result, setResult] = useState(resources);
+
+  useEffect(() => {
+    setResult(process(resources, dataState));
+  }, [resources]);
 
   const onDataStateChange = (event) => {
     setDataState(event.dataState);
