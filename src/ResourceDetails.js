@@ -3,7 +3,12 @@ import { useParams } from "react-router";
 import { Grid, GridColumn, GridToolbar } from "@progress/kendo-react-grid";
 import { Window } from "@progress/kendo-react-dialogs";
 
-import { getMonitorsForResource, getResourceInfo } from "./utils/azure";
+import {
+  getMonitorsForResource,
+  getResourceInfo,
+  updateMaintenanceStatus,
+} from "./utils/azure";
+import { getEmojiFromMonitorStatus } from "./utils/emoji";
 import AddMonitor from "./AddMonitor";
 
 import "@progress/kendo-theme-material/dist/all.css";
@@ -11,16 +16,7 @@ import "@progress/kendo-theme-material/dist/all.css";
 const MonitorStatusCell = (props) => {
   const { dataItem } = props;
   const { MonitorInternalStateID } = dataItem;
-
-  return (
-    <td>
-      {MonitorInternalStateID === 3
-        ? "❌"
-        : MonitorInternalStateID === 2
-        ? "🛠️"
-        : "✔️"}
-    </td>
-  );
+  return <td>{getEmojiFromMonitorStatus(MonitorInternalStateID)}</td>;
 };
 
 const ResourceDetails = () => {
@@ -43,6 +39,25 @@ const ResourceDetails = () => {
       requestMonitors();
     }
   };
+
+  async function toggleMaintenanceStatus() {
+    const { BestStateInternalID, WorstStateInternalID } = resource;
+    const status = WorstStateInternalID === 2 && BestStateInternalID === 2;
+
+    const json = await updateMaintenanceStatus(
+      tenantID,
+      siteID,
+      resourceID,
+      !status
+    );
+
+    if (json.data.success) {
+      alert("Maintenance Status is now: " + !status);
+      setTimeout(requestResource, 3000);
+    } else {
+      alert("Failed to update maintenance status");
+    }
+  }
 
   async function requestMonitors() {
     const json = await getMonitorsForResource(tenantID, siteID, resourceID);
@@ -86,15 +101,39 @@ const ResourceDetails = () => {
           float: "left",
         }}
       >
-        <p>
-          <strong>TenantID:</strong> {resource.TenantID}
-        </p>
-
         {Object.keys(resource).map((field) => (
           <p key={field}>
-            <strong>{field}:</strong> {resource[field]}
+            {field === "WorstStateInternalID" ||
+            field === "BestStateInternalID" ? (
+              <>
+                {" "}
+                <strong>{field}: </strong>{" "}
+                {getEmojiFromMonitorStatus(resource[field])}{" "}
+              </>
+            ) : (
+              <>
+                {" "}
+                <strong>{field}: </strong> {resource[field]}{" "}
+              </>
+            )}
           </p>
         ))}
+
+        <p>
+          <strong>Maintenance Status: </strong>{" "}
+          {getEmojiFromMonitorStatus(
+            resource.WorstStateInternalID === 2 &&
+              resource.BestStateInternalID === 2
+              ? 2
+              : 3
+          )}
+          <button
+            onClick={() => toggleMaintenanceStatus()}
+            className="k-button k-primary"
+          >
+            Toggle
+          </button>
+        </p>
       </section>
 
       <Grid data={resourceMonitors}>
