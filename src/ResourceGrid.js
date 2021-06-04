@@ -9,6 +9,7 @@ import "@progress/kendo-theme-material/dist/all.css";
 const DATA_ITEM_KEY = 'Pkey';
 const SELECTED_FIELD = 'selected';
 const idGetter = getter(DATA_ITEM_KEY);
+const selectGetter = getter(SELECTED_FIELD);
 const MaintenanceCell = (props) => {
   const { dataItem } = props;
   let inMaintenance = false;
@@ -53,20 +54,23 @@ const ResourceGrid = (props) => {
   const [result, setResult] = useState(resources.map(item => ({ ...item,
     [SELECTED_FIELD]: selectedState[idGetter(item)]
   })));
-  // const [data, setData] = useState(resources);
 
   const selectionChange = event => {
-    const newSelectedState = getSelectedState({
-      event,
-      selectedState: selectedState,
-      dataItemKey: DATA_ITEM_KEY
-    });
-    setSelectedState(newSelectedState);
-    console.log(newSelectedState);
+    const item = event.dataItem;
+    var id = idGetter(item)
+    var isSlected = selectGetter(item);
+    const newSelectedState = {};
+    newSelectedState[id] = !isSlected;
+    const finalState = {
+      ...selectedState,
+      ...newSelectedState
+    }
+    setSelectedState(finalState);
+    console.log(finalState);
     //TODO: Gives warning added as result.map is not working
     var data =  Array.isArray(result) ? result : result.data;
     data.forEach(item => {
-      var k = newSelectedState[item[DATA_ITEM_KEY]];
+      var k = finalState[item[DATA_ITEM_KEY]];
         if(k != undefined)
         item[SELECTED_FIELD] = k;
         else
@@ -79,6 +83,7 @@ const ResourceGrid = (props) => {
     const status =
       dataItem.WorstStateInternalID === 2 && dataItem.BestStateInternalID === 2;
 
+      console.log("Triggering maintenance for device-"+ResourceID);
     await updateMaintenanceStatus(
       TenantID,
       SiteID,
@@ -87,7 +92,6 @@ const ResourceGrid = (props) => {
       true
     );
 
-    console.log("Sucessfully triggered maintenance for device-"+ResourceID);
   }
 
   const onToggleBtnClick = event => {
@@ -138,8 +142,9 @@ const ResourceGrid = (props) => {
       {...dataState}
       dataItemKey={DATA_ITEM_KEY} selectedField={SELECTED_FIELD} selectable={{
         enabled: true,
-        drag: false,
-        cell: false
+        drag: true,
+        cell: false,
+        mode: 'multiple'
       }} onSelectionChange={selectionChange} onHeaderSelectionChange={headerSelectionChange}>
   
       <GridToolbar>

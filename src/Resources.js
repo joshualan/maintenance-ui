@@ -49,7 +49,7 @@ const Resources = () => {
     }
     finalJson.forEach (item => {
       //set a unique key with <tenant id>::<site id>::<resource id>
-      item["Pkey"] = item["TenantID"] + "::" + item["SiteID"] + "::" + item["ResourceID"];
+      item["Pkey"] = item["TenantID"] + "-" + item["SiteID"] + "-" + item["ResourceID"];
     });
     console.log(finalJson);
     setResources(finalJson);
