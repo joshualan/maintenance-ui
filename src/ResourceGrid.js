@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Grid, GridColumn, GridToolbar, getSelectedState } from "@progress/kendo-react-grid";
+import { Grid, GridColumn, GridToolbar } from "@progress/kendo-react-grid";
 import { process } from "@progress/kendo-data-query";
 import { Link } from "react-router-dom";
 import { updateMaintenanceStatus } from "./utils/azure";
@@ -94,7 +94,7 @@ const ResourceGrid = (props) => {
 
   }
 
-  const onToggleBtnClick = event => {
+  const onToggleBtnClick = () => {
     
     console.log(selectedState);
     var data =  Array.isArray(result) ? result : result.data;
@@ -152,7 +152,7 @@ const ResourceGrid = (props) => {
           title="Toggle"
           className="k-button k-primary"
           onClick={onToggleBtnClick}
-          >Toggle
+          >Toggle Maintenance Status
         </button>
       </GridToolbar>
       <GridColumn field="selected" width="100px" headerSelectionValue={

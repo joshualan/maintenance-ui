@@ -51,7 +51,6 @@ const Resources = () => {
       //set a unique key with <tenant id>::<site id>::<resource id>
       item["Pkey"] = item["TenantID"] + "-" + item["SiteID"] + "-" + item["ResourceID"];
     });
-    console.log(finalJson);
     setResources(finalJson);
   }
 
@@ -61,6 +60,7 @@ const Resources = () => {
 
   const handleSiteChange = (event) => {
     setSite(event.target.value);
+    console.log(site);
   };
 
   return (
