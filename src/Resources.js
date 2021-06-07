@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { DropDownList } from "@progress/kendo-react-dropdowns";
+import { DropDownList, MultiSelect } from "@progress/kendo-react-dropdowns";
 
 import ResourceGrid from "./ResourceGrid";
 import { getTenantsAndSites, getResources } from "./utils/azure";
@@ -38,8 +38,21 @@ const Resources = () => {
       return;
     }
 
-    const json = await getResources(tenant, site);
-    setResources(json);
+    var finalJson = [];
+    if(Array.isArray(site)){
+      for(const s of site){
+        const json = await getResources(tenant, s);
+        finalJson = finalJson.concat(json);
+      }
+    } else {
+      finalJson = await getResources(tenant, site);
+    }
+    finalJson.forEach (item => {
+      //set a unique key with <tenant id>::<site id>::<resource id>
+      item["Pkey"] = item["TenantID"] + "-" + item["SiteID"] + "-" + item["ResourceID"];
+    });
+    console.log(finalJson);
+    setResources(finalJson);
   }
 
   const handleTenantChange = (event) => {
@@ -66,7 +79,7 @@ const Resources = () => {
           required={true}
           onChange={handleTenantChange}
         />
-        <DropDownList
+        <MultiSelect
           label="Site"
           name="site"
           data={sitesList}

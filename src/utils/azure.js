@@ -18,7 +18,7 @@ async function getResources(tenantID, siteID) {
   return json;
 }
 
-async function updateMaintenanceStatus(tenantID, siteID, resourceID, status) {
+async function updateMaintenanceStatus(tenantID, siteID, resourceID, status, async = false) {
   const res = await fetch(
     `http://nmapi.azure-api.net/wugapi/${tenantID}/${siteID}/api/v1/devices/${resourceID}/config/maintenance`,
     {
@@ -27,6 +27,9 @@ async function updateMaintenanceStatus(tenantID, siteID, resourceID, status) {
         enabled: status,
         reason: "some reason",
       }),
+      headers:{
+        "ASYNC_API_CALL": async
+      }
     }
   );
   const json = await res.json();
