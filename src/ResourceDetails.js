@@ -91,7 +91,7 @@ const ResourceDetails = () => {
           initialHeight={1200}
           resizable={true}
         >
-          <AddMonitor resource={resource} />
+          <AddMonitor resources={[resource]} />
         </Window>
       )}
 

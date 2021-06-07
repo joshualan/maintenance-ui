@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Grid, GridColumn, GridToolbar } from "@progress/kendo-react-grid";
 import { process } from "@progress/kendo-data-query";
+import { Window } from "@progress/kendo-react-dialogs";
 import { Link } from "react-router-dom";
 import { updateMaintenanceStatus } from "./utils/azure";
-import { getter } from '@progress/kendo-react-common';
+import AddMonitor from "./AddMonitor";
+import { getter } from "@progress/kendo-react-common";
 import "@progress/kendo-theme-material/dist/all.css";
 
-const DATA_ITEM_KEY = 'Pkey';
-const SELECTED_FIELD = 'selected';
+const DATA_ITEM_KEY = "Pkey";
+const SELECTED_FIELD = "selected";
 const idGetter = getter(DATA_ITEM_KEY);
 const selectGetter = getter(SELECTED_FIELD);
 const MaintenanceCell = (props) => {
@@ -48,33 +50,36 @@ const MaintenanceCell = (props) => {
 };
 
 const ResourceGrid = (props) => {
-  const { resources } = props;
+  const { resources, sites } = props;
   const [selectedState, setSelectedState] = React.useState({});
   const [dataState, setDataState] = useState({});
-  const [result, setResult] = useState(resources.map(item => ({ ...item,
-    [SELECTED_FIELD]: selectedState[idGetter(item)]
-  })));
+  const [result, setResult] = useState(
+    resources.map((item) => ({
+      ...item,
+      [SELECTED_FIELD]: selectedState[idGetter(item)],
+    }))
+  );
+  const [addMonitorWindowVisibility, setAddMonitorWindowVisibility] =
+    useState(false);
 
-  const selectionChange = event => {
+  const selectionChange = (event) => {
     const item = event.dataItem;
-    var id = idGetter(item)
+    var id = idGetter(item);
     var isSlected = selectGetter(item);
     const newSelectedState = {};
     newSelectedState[id] = !isSlected;
     const finalState = {
       ...selectedState,
-      ...newSelectedState
-    }
+      ...newSelectedState,
+    };
     setSelectedState(finalState);
     console.log(finalState);
     //TODO: Gives warning added as result.map is not working
-    var data =  Array.isArray(result) ? result : result.data;
-    data.forEach(item => {
+    var data = Array.isArray(result) ? result : result.data;
+    data.forEach((item) => {
       var k = finalState[item[DATA_ITEM_KEY]];
-        if(k != undefined)
-        item[SELECTED_FIELD] = k;
-        else
-        item[SELECTED_FIELD] = false;
+      if (k != undefined) item[SELECTED_FIELD] = k;
+      else item[SELECTED_FIELD] = false;
     });
   };
 
@@ -83,37 +88,32 @@ const ResourceGrid = (props) => {
     const status =
       dataItem.WorstStateInternalID === 2 && dataItem.BestStateInternalID === 2;
 
-      console.log("Triggering maintenance for device-"+ResourceID);
-    await updateMaintenanceStatus(
-      TenantID,
-      SiteID,
-      ResourceID,
-      !status,
-      true
-    );
-
+    console.log("Triggering maintenance for device-" + ResourceID);
+    await updateMaintenanceStatus(TenantID, SiteID, ResourceID, !status, true);
   }
 
   const onToggleBtnClick = () => {
-    
     console.log(selectedState);
-    var data =  Array.isArray(result) ? result : result.data;
-    data.forEach(item => {
+    var data = Array.isArray(result) ? result : result.data;
+    data.forEach((item) => {
       var pk = item[DATA_ITEM_KEY];
       var isSelected = selectedState[pk];
-        if(isSelected != undefined){
-          console.log("toggling maintenance state for "+pk)
-          toggleMaintenanceStatusAsync(item);
-        }
+      if (isSelected != undefined) {
+        console.log("toggling maintenance state for " + pk);
+        toggleMaintenanceStatusAsync(item);
+      }
     });
-    // alert("Updated Maintenance Status for selected resources");
   };
- 
-  const headerSelectionChange = event => {
+
+  const toggleAddMonitorWindow = () => {
+    setAddMonitorWindowVisibility(!addMonitorWindowVisibility);
+  };
+
+  const headerSelectionChange = (event) => {
     const checked = event.syntheticEvent.target.checked;
     const newSelectedState = {};
-    var data =  Array.isArray(result) ? result : result.data;
-    data.forEach(item => {
+    var data = Array.isArray(result) ? result : result.data;
+    data.forEach((item) => {
       newSelectedState[idGetter(item)] = checked;
       //TODO: Gives warning added as result.map is not working
       item[SELECTED_FIELD] = checked;
@@ -131,52 +131,86 @@ const ResourceGrid = (props) => {
   };
 
   return (
-    <Grid
-      data={result}
-      // TODO: Getting error if this line is enabled
-      // data={result.map(item => ({ ...item,
-      //   [SELECTED_FIELD]: selectedState[idGetter(item)]
-      // }))}
-      filterable={true}
-      onDataStateChange={onDataStateChange}
-      {...dataState}
-      dataItemKey={DATA_ITEM_KEY} selectedField={SELECTED_FIELD} selectable={{
-        enabled: true,
-        drag: true,
-        cell: false,
-        mode: 'multiple'
-      }} onSelectionChange={selectionChange} onHeaderSelectionChange={headerSelectionChange}>
-  
-      <GridToolbar>
-        <button
-          title="Toggle"
-          className="k-button k-primary"
-          onClick={onToggleBtnClick}
-          >Toggle Maintenance Status
-        </button>
-      </GridToolbar>
-      <GridColumn field="selected" width="100px" headerSelectionValue={
-        Array.isArray(result) ? 
-        result.findIndex(item => !selectedState[idGetter(item)]) === -1 
-        : result.data.findIndex(item => !selectedState[idGetter(item)]) === -1 
-        } />
-      <GridColumn
-        field="DisplayName"
-        title="Display Name"
-        cell={(props) => (
-          <td>
-            <Link
-              to={`details/${props.dataItem.TenantID}/${props.dataItem.SiteID}/${props.dataItem.ResourceID}`}
-            >
-              {props.dataItem[props.field]}
-            </Link>
-          </td>
-        )}
-      />
-      <GridColumn field="ResourceID" title="Resource ID" />
-      <GridColumn field="DefaultIPAddress" title="IP Address" />
-      <GridColumn title="Maintenance Status" cell={MaintenanceCell} />
-    </Grid>
+    <>
+      {addMonitorWindowVisibility && (
+        <Window
+          title="Add Monitor"
+          modal={true}
+          onClose={toggleAddMonitorWindow}
+          initialWidth={1500}
+          initialHeight={1200}
+          resizable={true}
+        >
+          <AddMonitor resources={[resources[0]]} />
+        </Window>
+      )}
+      <Grid
+        data={result}
+        // TODO: Getting error if this line is enabled
+        // data={result.map(item => ({ ...item,
+        //   [SELECTED_FIELD]: selectedState[idGetter(item)]
+        // }))}
+        filterable={true}
+        onDataStateChange={onDataStateChange}
+        {...dataState}
+        dataItemKey={DATA_ITEM_KEY}
+        selectedField={SELECTED_FIELD}
+        selectable={{
+          enabled: true,
+          drag: true,
+          cell: false,
+          mode: "multiple",
+        }}
+        onSelectionChange={selectionChange}
+        onHeaderSelectionChange={headerSelectionChange}
+      >
+        <GridToolbar>
+          <button
+            title="Toggle"
+            className="k-button k-primary"
+            onClick={onToggleBtnClick}
+          >
+            Toggle Maintenance Status
+          </button>
+          <button
+            title="massAssignMonitors"
+            className="k-button k-primary"
+            onClick={toggleAddMonitorWindow}
+            disabled={sites.length !== 1 || !resources || resources.length < 1}
+          >
+            Add Monitor
+          </button>
+        </GridToolbar>
+        <GridColumn
+          field="selected"
+          width="100px"
+          headerSelectionValue={
+            Array.isArray(result)
+              ? result.findIndex((item) => !selectedState[idGetter(item)]) ===
+                -1
+              : result.data.findIndex(
+                  (item) => !selectedState[idGetter(item)]
+                ) === -1
+          }
+        />
+        <GridColumn
+          field="DisplayName"
+          title="Display Name"
+          cell={(props) => (
+            <td>
+              <Link
+                to={`details/${props.dataItem.TenantID}/${props.dataItem.SiteID}/${props.dataItem.ResourceID}`}
+              >
+                {props.dataItem[props.field]}
+              </Link>
+            </td>
+          )}
+        />
+        <GridColumn field="ResourceID" title="Resource ID" />
+        <GridColumn field="DefaultIPAddress" title="IP Address" />
+        <GridColumn title="Maintenance Status" cell={MaintenanceCell} />
+      </Grid>
+    </>
   );
 };
 

@@ -8,10 +8,11 @@ import { Grid, GridColumn } from "@progress/kendo-react-grid";
 import { process } from "@progress/kendo-data-query";
 
 const AddMonitor = (props) => {
-  const { resource } = props;
-  const { TenantID, SiteID, id: ResourceID } = resource;
+  const { resources } = props;
+  const { TenantID, SiteID } = resources[0];
   const [siteMonitors, setSiteMonitors] = useState([]);
   const [dataState, setDataState] = useState({});
+  const resourceNames = resources.map((r) => r.DisplayName);
 
   // CommandCell for adding a button to assign a new monitor
   const CommandCell = (props) => {
@@ -26,26 +27,31 @@ const AddMonitor = (props) => {
     async function assignMonitorToResource(dataItem) {
       if (
         window.confirm(
-          `Are you sure you want to assign ${dataItem.MonitorName} to ${resource.DisplayName}?`
+          `Are you sure you want to assign ${
+            dataItem.MonitorName
+          } to ${resourceNames.join(",")}?`
         )
       ) {
-        const json = await addMonitorToResource(
-          TenantID,
-          SiteID,
-          ResourceID,
-          dataItem
-        );
-
-        if (json.data.successful === 1) {
-          setDisabled(true);
-          setTimeout(() => {
-            requestMonitors();
-          }, 5000);
-          alert(
-            `${dataItem.MonitorName} was successfully assigned to ${resource.DisplayName}.`
+        for (const resource of resources) {
+          const { id: ResourceID, DisplayName } = resource;
+          const json = await addMonitorToResource(
+            TenantID,
+            SiteID,
+            ResourceID,
+            dataItem
           );
-        } else {
-          alert(`An error occurred`);
+
+          if (json && json.data && json.data.successful === 1) {
+            setDisabled(true);
+            setTimeout(() => {
+              requestMonitors();
+            }, 5000);
+            alert(
+              `${dataItem.MonitorName} was successfully assigned to ${DisplayName}!.`
+            );
+          } else {
+            alert(`An error occurred`);
+          }
         }
       }
     }
@@ -99,21 +105,24 @@ const AddMonitor = (props) => {
   }, []);
 
   async function requestMonitors() {
-    const monitorsForResource = await getMonitorsForResource(
-      TenantID,
-      SiteID,
-      ResourceID
-    );
-
     const monitorIdSet = new Set();
 
-    monitorsForResource["active"].forEach((element) => {
-      monitorIdSet.add(element.ActiveMonitorCLSID);
-    });
+    for (const resource of resources) {
+      const { id: ResourceID } = resource;
+      const monitorsForResource = await getMonitorsForResource(
+        TenantID,
+        SiteID,
+        ResourceID
+      );
 
-    monitorsForResource["statistical"].forEach((element) => {
-      monitorIdSet.add(element.StatisticalMonitorCLSID);
-    });
+      monitorsForResource["active"].forEach((element) => {
+        monitorIdSet.add(element.ActiveMonitorCLSID);
+      });
+
+      monitorsForResource["statistical"].forEach((element) => {
+        monitorIdSet.add(element.StatisticalMonitorCLSID);
+      });
+    }
 
     const monitorsForSite = await getMonitorsForSite(TenantID, SiteID);
     const monitors = [];
@@ -141,7 +150,7 @@ const AddMonitor = (props) => {
 
   return (
     <div>
-      {TenantID} {SiteID} {ResourceID}
+      {TenantID} {SiteID} {resourceNames.join(", ")}
       <Grid
         resizable={true}
         reorderable={true}
