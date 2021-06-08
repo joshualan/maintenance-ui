@@ -14,6 +14,7 @@ const idGetter = getter(DATA_ITEM_KEY);
 const MaintenanceCell = (props) => {
   const { dataItem } = props;
   let inMaintenance = false;
+  
   if (
     dataItem.WorstStateInternalID === 2 ||
     dataItem.BestStateInternalID === 2
@@ -21,29 +22,9 @@ const MaintenanceCell = (props) => {
     inMaintenance = true;
   }
 
-  async function toggleMaintenanceStatus(dataItem) {
-    const { TenantID, SiteID, ResourceID } = dataItem;
-    const status =
-      dataItem.WorstStateInternalID === 2 && dataItem.BestStateInternalID === 2;
-
-    const json = await updateMaintenanceStatus(
-      TenantID,
-      SiteID,
-      ResourceID,
-      !status
-    );
-
-    if (json.data.success) {
-      alert("Maintenance Status is now: " + !status);
-    } else {
-      alert("Failed to update maintenance status");
-    }
-  }
-
   return (
     <td>
       {inMaintenance ? "In Maintenance " : "Not In Maintenance "}
-      <button onClick={() => toggleMaintenanceStatus(dataItem)}>Toggle</button>
     </td>
   );
 };
@@ -53,6 +34,7 @@ const ResourceGrid = (props) => {
   const [dataState, setDataState] = useState({});
   const [result, setResult] = useState(resources || []);
   const [selectedState, setSelectedState] = useState({});
+  const [selectedResources, setSelectedResources] = useState([]);
 
   const [addMonitorWindowVisibility, setAddMonitorWindowVisibility] =
     useState(false);
@@ -62,12 +44,11 @@ const ResourceGrid = (props) => {
   };
 
   async function onToggleBtnClick() {
-    for (const resource of resources) {
-      if (selectedState[idGetter(resource)]) {
+    for (const resource of selectedResources) {
         const { TenantID, SiteID, ResourceID } = resource;
 
         const status =
-        resource.WorstStateInternalID === 2 && resource.BestStateInternalID === 2;
+          resource.WorstStateInternalID === 2 && resource.BestStateInternalID === 2;
   
       const json = await updateMaintenanceStatus(
         TenantID,
@@ -81,7 +62,7 @@ const ResourceGrid = (props) => {
       } else {
         alert(`Failed to update maintenance status of ${resource.DisplayName}`);
       }
-      }
+      
     }
   }
 
@@ -93,6 +74,10 @@ const ResourceGrid = (props) => {
     
     setResult(process(resources, dataState));
   }, [resources]);
+
+  useEffect(() => {
+    setSelectedResources(resources.filter(r => selectedState[idGetter(r)]))
+  }, [selectedState]);
 
   const onDataStateChange = (event) => {
     setDataState(event.dataState);
@@ -128,7 +113,7 @@ const ResourceGrid = (props) => {
           initialHeight={1200}
           resizable={true}
         >
-          <AddMonitor resources={[resources[0]]} />
+          <AddMonitor resources={[selectedResources]} />
         </Window>
       )}
       <Grid
@@ -151,6 +136,7 @@ const ResourceGrid = (props) => {
             title="Toggle"
             className="k-button k-primary"
             onClick={onToggleBtnClick}
+            disabled={selectedResources.length < 1}
           >
             Toggle Maintenance Status
           </button>
@@ -158,7 +144,7 @@ const ResourceGrid = (props) => {
             title="massAssignMonitors"
             className="k-button k-primary"
             onClick={toggleAddMonitorWindow}
-            disabled={sites.length !== 1 || !resources || resources.length < 1}
+            disabled={selectedResources.length < 1}
           >
             Add Monitor
           </button>
