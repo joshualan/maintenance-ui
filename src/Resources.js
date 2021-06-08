@@ -7,7 +7,7 @@ import { getTenantsAndSites, getResources } from "./utils/azure";
 const Resources = () => {
   const [tenant, setTenant] = useState("");
   const [tenantsList, setTenantsList] = useState([]);
-  const [sites, setSites] = useState("");
+  const [sites, setSites] = useState([]);
   const [siteMap, setSiteMap] = useState({});
   const [sitesList, setSitesList] = useState([]);
   const [resources, setResources] = useState([]);
@@ -39,19 +39,11 @@ const Resources = () => {
     }
 
     var finalJson = [];
-    if (Array.isArray(sites)) {
-      for (const s of sites) {
-        const json = await getResources(tenant, s);
-        finalJson = finalJson.concat(json);
-      }
-    } else {
-      finalJson = await getResources(tenant, site);
+    for (const s of sites) {
+      const json = await getResources(tenant, s);
+      finalJson = finalJson.concat(json);
     }
-    finalJson.forEach((item) => {
-      //set a unique key with <tenant id>::<site id>::<resource id>
-      item["Pkey"] =
-        item["TenantID"] + "-" + item["SiteID"] + "-" + item["ResourceID"];
-    });
+
     setResources(finalJson);
   }
 
