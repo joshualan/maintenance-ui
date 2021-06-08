@@ -113,7 +113,7 @@ const ResourceGrid = (props) => {
           initialHeight={1200}
           resizable={true}
         >
-          <AddMonitor resources={[selectedResources]} />
+          <AddMonitor resources={selectedResources} />
         </Window>
       )}
       <Grid
