@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Grid, GridColumn, GridToolbar, getSelectedState } from "@progress/kendo-react-grid";
+import { Grid, GridColumn, GridToolbar } from "@progress/kendo-react-grid";
 import { process } from "@progress/kendo-data-query";
 import { Window } from "@progress/kendo-react-dialogs";
 import { Link } from "react-router-dom";
@@ -11,7 +11,6 @@ import "@progress/kendo-theme-material/dist/all.css";
 const DATA_ITEM_KEY = "Pkey";
 const SELECTED_FIELD = "selected";
 const idGetter = getter(DATA_ITEM_KEY);
-const selectGetter = getter(SELECTED_FIELD);
 const MaintenanceCell = (props) => {
   const { dataItem } = props;
   let inMaintenance = false;
@@ -62,22 +61,60 @@ const ResourceGrid = (props) => {
     setAddMonitorWindowVisibility(!addMonitorWindowVisibility);
   };
 
-  useEffect(() => {
-    // if (resources.length > 0 && !resources[0][DATA_ITEM_KEY]) {
-    //   resources.forEach((r, index) => {
-    //     resources[index][DATA_ITEM_KEY] = `${r.SiteID}-${r.ResourceID}`;
-    //     resources[index][SELECTED_FIELD] = false;
-    //   });
-    // }
+  async function onToggleBtnClick() {
+    for (const resource of resources) {
+      if (selectedState[idGetter(resource)]) {
+        const { TenantID, SiteID, ResourceID } = resource;
 
+        const status =
+        resource.WorstStateInternalID === 2 && resource.BestStateInternalID === 2;
+  
+      const json = await updateMaintenanceStatus(
+        TenantID,
+        SiteID,
+        ResourceID,
+        !status
+      );
+  
+      if (json && json.data && json.data.success) {
+        alert(`Maintenance Status of ${resource.DisplayName} is now ${!status}`);
+      } else {
+        alert(`Failed to update maintenance status of ${resource.DisplayName}`);
+      }
+      }
+    }
+  }
+
+  useEffect(() => {
+    resources.forEach((r, index) => {
+      resources[index][DATA_ITEM_KEY] = `${r.SiteID}-${r.ResourceID}`;
+      resources[index][SELECTED_FIELD] = false;
+    });
+    
     setResult(process(resources, dataState));
-    console.log(result);
   }, [resources]);
 
   const onDataStateChange = (event) => {
     setDataState(event.dataState);
-    // setResult(process(resources, event.dataState));
     setResult(process(resources, event.dataState));
+  };
+
+  const selectionChange = (event) => {
+    // getSelectedState() is garbage, never use it
+    const newSelectedState = {...selectedState};
+    newSelectedState[event.dataItem[DATA_ITEM_KEY]] = event.syntheticEvent.target.checked;
+    setSelectedState(newSelectedState);
+    event.dataItem[SELECTED_FIELD] = !event.dataItem[SELECTED_FIELD];
+  };
+
+  const headerSelectionChange = (event) => {
+    const checked = event.syntheticEvent.target.checked;
+    const newSelectedState = {};
+    resources.forEach((item) => {
+      newSelectedState[idGetter(item)] = checked;
+      item[SELECTED_FIELD] = checked;
+    });
+    setSelectedState(newSelectedState);
   };
 
   return (
@@ -99,15 +136,24 @@ const ResourceGrid = (props) => {
         filterable={true}
         onDataStateChange={onDataStateChange}
         {...dataState}
+        dataItemKey={DATA_ITEM_KEY}
+        selectedField={SELECTED_FIELD}
+        selectable={{
+          enabled: true,
+          drag: false,
+          cell: false,
+        }}
+        onSelectionChange={selectionChange}
+        onHeaderSelectionChange={headerSelectionChange}
       >
         <GridToolbar>
-          {/* <button
+          <button
             title="Toggle"
             className="k-button k-primary"
             onClick={onToggleBtnClick}
           >
             Toggle Maintenance Status
-          </button> */}
+          </button>
           <button
             title="massAssignMonitors"
             className="k-button k-primary"
@@ -117,7 +163,13 @@ const ResourceGrid = (props) => {
             Add Monitor
           </button>
         </GridToolbar>
-
+        <GridColumn
+          field="selected"
+          width="150px"
+          headerSelectionValue={
+            resources.findIndex((item) => !selectedState[idGetter(item)]) === -1
+          }
+        />
         <GridColumn
           field="DisplayName"
           title="Display Name"
