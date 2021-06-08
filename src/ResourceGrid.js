@@ -14,7 +14,7 @@ const idGetter = getter(DATA_ITEM_KEY);
 const MaintenanceCell = (props) => {
   const { dataItem } = props;
   let inMaintenance = false;
-  
+
   if (
     dataItem.WorstStateInternalID === 2 ||
     dataItem.BestStateInternalID === 2
@@ -22,11 +22,7 @@ const MaintenanceCell = (props) => {
     inMaintenance = true;
   }
 
-  return (
-    <td>
-      {inMaintenance ? "In Maintenance " : "Not In Maintenance "}
-    </td>
-  );
+  return <td>{inMaintenance ? "In Maintenance " : "Not In Maintenance "}</td>;
 };
 
 const ResourceGrid = (props) => {
@@ -45,24 +41,26 @@ const ResourceGrid = (props) => {
 
   async function onToggleBtnClick() {
     for (const resource of selectedResources) {
-        const { TenantID, SiteID, ResourceID } = resource;
+      const { TenantID, SiteID, ResourceID } = resource;
 
-        const status =
-          resource.WorstStateInternalID === 2 && resource.BestStateInternalID === 2;
-  
+      const status =
+        resource.WorstStateInternalID === 2 &&
+        resource.BestStateInternalID === 2;
+
       const json = await updateMaintenanceStatus(
         TenantID,
         SiteID,
         ResourceID,
         !status
       );
-  
+
       if (json && json.data && json.data.success) {
-        alert(`Maintenance Status of ${resource.DisplayName} is now ${!status}`);
+        alert(
+          `Maintenance Status of ${resource.DisplayName} is now ${!status}`
+        );
       } else {
         alert(`Failed to update maintenance status of ${resource.DisplayName}`);
       }
-      
     }
   }
 
@@ -71,12 +69,12 @@ const ResourceGrid = (props) => {
       resources[index][DATA_ITEM_KEY] = `${r.SiteID}-${r.ResourceID}`;
       resources[index][SELECTED_FIELD] = false;
     });
-    
+
     setResult(process(resources, dataState));
   }, [resources]);
 
   useEffect(() => {
-    setSelectedResources(resources.filter(r => selectedState[idGetter(r)]))
+    setSelectedResources(resources.filter((r) => selectedState[idGetter(r)]));
   }, [selectedState]);
 
   const onDataStateChange = (event) => {
@@ -86,8 +84,9 @@ const ResourceGrid = (props) => {
 
   const selectionChange = (event) => {
     // getSelectedState() is garbage, never use it
-    const newSelectedState = {...selectedState};
-    newSelectedState[event.dataItem[DATA_ITEM_KEY]] = event.syntheticEvent.target.checked;
+    const newSelectedState = { ...selectedState };
+    newSelectedState[event.dataItem[DATA_ITEM_KEY]] =
+      event.syntheticEvent.target.checked;
     setSelectedState(newSelectedState);
     event.dataItem[SELECTED_FIELD] = !event.dataItem[SELECTED_FIELD];
   };
