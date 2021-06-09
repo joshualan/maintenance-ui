@@ -1,29 +1,34 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import Resources from "./Resources";
 import ResourceDetails from "./ResourceDetails";
+import Header from "./Header";
+
+import "./styles/something.css";
+import "@progress/kendo-theme-material/dist/all.css";
 
 const App = () => {
   return (
-    <div>
+    <>
       <Router>
-        <header>
-          <Link to="/">
-            <h1>WUG Resource List</h1>
-          </Link>
-        </header>
         <Switch>
           <Route path="/details/:tenantID/:siteID/:resourceID">
-            <ResourceDetails />
+            <Header page={"Device Detail"} />
+            <div className="page-content">
+              <ResourceDetails />
+            </div>
           </Route>
           <Route path="/">
-            <Resources></Resources>
+            <Header page={"Resource List"} />
+            <div className="page-content">
+              <Resources />
+            </div>
           </Route>
         </Switch>
       </Router>
-    </div>
+    </>
   );
 };
 

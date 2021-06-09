@@ -6,12 +6,15 @@ import {
 } from "./utils/azure";
 import { Grid, GridColumn } from "@progress/kendo-react-grid";
 import { process } from "@progress/kendo-data-query";
+import LoadingPanel from "./LoadingPanel";
 
 const AddMonitor = (props) => {
   const { resources } = props;
   const { TenantID, SiteID } = resources[0];
   const [siteMonitors, setSiteMonitors] = useState([]);
   const [dataState, setDataState] = useState({});
+  const [loading, setLoading] = useState(false);
+
   const resourceNames = resources.map((r) => r.DisplayName);
 
   // CommandCell for adding a button to assign a new monitor
@@ -32,6 +35,7 @@ const AddMonitor = (props) => {
           } to ${resourceNames.join(",")}?`
         )
       ) {
+        setLoading(true);
         for (const resource of resources) {
           const { id: ResourceID, DisplayName } = resource;
           const json = await addMonitorToResource(
@@ -43,9 +47,6 @@ const AddMonitor = (props) => {
 
           if (json && json.data && json.data.successful === 1) {
             setDisabled(true);
-            setTimeout(() => {
-              requestMonitors();
-            }, 5000);
             alert(
               `${dataItem.MonitorName} was successfully assigned to ${DisplayName}!.`
             );
@@ -53,6 +54,14 @@ const AddMonitor = (props) => {
             alert(`An error occurred`);
           }
         }
+        setLoading(false);
+
+        // remove the monitor we just added from the list
+        setSiteMonitors(
+          siteMonitors.filter((value) => {
+            return dataItem !== value;
+          })
+        );
       }
     }
 
@@ -107,6 +116,7 @@ const AddMonitor = (props) => {
   async function requestMonitors() {
     const monitorIdSet = new Set();
 
+    setLoading(true);
     for (const resource of resources) {
       const { id: ResourceID } = resource;
       const monitorsForResource = await getMonitorsForResource(
@@ -146,10 +156,12 @@ const AddMonitor = (props) => {
     });
 
     setSiteMonitors(monitors);
+    setLoading(false);
   }
 
   return (
     <div>
+      {loading && <LoadingPanel />}
       {TenantID} {SiteID} {resourceNames.join(", ")}
       <Grid
         resizable={true}

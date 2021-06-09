@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { DropDownList, MultiSelect } from "@progress/kendo-react-dropdowns";
+import { Form, FormElement } from "@progress/kendo-react-form";
 
 import ResourceGrid from "./ResourceGrid";
+import LoadingPanel from "./LoadingPanel";
 import { getTenantsAndSites, getResources } from "./utils/azure";
 
 const Resources = () => {
@@ -11,6 +13,7 @@ const Resources = () => {
   const [siteMap, setSiteMap] = useState({});
   const [sitesList, setSitesList] = useState([]);
   const [resources, setResources] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     requestTenants();
@@ -19,6 +22,11 @@ const Resources = () => {
   useEffect(() => {
     setSitesList(siteMap[tenant] || []);
   }, [tenant]);
+
+  useEffect(() => {
+    setResources([]);
+    requestResources();
+  }, [sites]);
 
   async function requestTenants() {
     const json = await getTenantsAndSites();
@@ -37,13 +45,13 @@ const Resources = () => {
     if (!tenant || !sites) {
       return;
     }
-
+    setLoading(true);
     var finalJson = [];
     for (const s of sites) {
       const json = await getResources(tenant, s);
       finalJson = finalJson.concat(json);
     }
-
+    setLoading(false);
     setResources(finalJson);
   }
 
@@ -57,29 +65,29 @@ const Resources = () => {
 
   return (
     <div className="search-params">
-      <form
+      {loading && <LoadingPanel />}
+      <Form
         className="k-form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          requestResources();
-        }}
-      >
-        <DropDownList
-          label="Tenant"
-          name="tenant"
-          data={tenantsList}
-          required={true}
-          onChange={handleTenantChange}
-        />
-        <MultiSelect
-          label="Site"
-          name="site"
-          data={sitesList}
-          required={true}
-          onChange={handleSiteChange}
-        />
-        <button className="k-button k-primary">Submit</button>
-      </form>
+        onSubmit={requestResources}
+        render={() => (
+          <FormElement>
+            <DropDownList
+              label="Tenant"
+              name="tenant"
+              data={tenantsList}
+              required={true}
+              onChange={handleTenantChange}
+            />
+            <MultiSelect
+              label="Site"
+              name="site"
+              data={sitesList}
+              required={true}
+              onChange={handleSiteChange}
+            />
+          </FormElement>
+        )}
+      />
 
       <ResourceGrid resources={resources} sites={sites}></ResourceGrid>
     </div>

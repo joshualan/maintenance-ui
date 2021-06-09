@@ -2,6 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { Grid, GridColumn, GridToolbar } from "@progress/kendo-react-grid";
 import { Window } from "@progress/kendo-react-dialogs";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardBody,
+  CardSubtitle,
+} from "@progress/kendo-react-layout";
 
 import {
   getMonitorsForResource,
@@ -10,8 +17,7 @@ import {
 } from "./utils/azure";
 import { getEmojiFromMonitorStatus } from "./utils/emoji";
 import AddMonitor from "./AddMonitor";
-
-import "@progress/kendo-theme-material/dist/all.css";
+import LoadingPanel from "./LoadingPanel";
 
 const MonitorStatusCell = (props) => {
   const { dataItem } = props;
@@ -25,6 +31,7 @@ const ResourceDetails = () => {
   const [resourceMonitors, setResourceMonitors] = useState([]);
   const [addMonitorWindowVisibility, setAddMonitorWindowVisibility] =
     useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     requestResource();
@@ -44,6 +51,7 @@ const ResourceDetails = () => {
     const { BestStateInternalID, WorstStateInternalID } = resource;
     const status = WorstStateInternalID === 2 && BestStateInternalID === 2;
 
+    setLoading(true);
     const json = await updateMaintenanceStatus(
       tenantID,
       siteID,
@@ -53,13 +61,15 @@ const ResourceDetails = () => {
 
     if (json.data.success) {
       alert("Maintenance Status is now: " + !status);
-      setTimeout(requestResource, 3000);
     } else {
       alert("Failed to update maintenance status");
     }
+    setLoading(false);
   }
 
   async function requestMonitors() {
+    setLoading(true);
+
     const json = await getMonitorsForResource(tenantID, siteID, resourceID);
     const monitors = [];
 
@@ -73,11 +83,14 @@ const ResourceDetails = () => {
       monitors.push(element);
     });
     setResourceMonitors(monitors);
+    setLoading(false);
   }
 
   async function requestResource() {
+    setLoading(true);
     const json = await getResourceInfo(tenantID, siteID, resourceID);
     setResource(json[0]);
+    setLoading(false);
   }
 
   return (
@@ -94,47 +107,77 @@ const ResourceDetails = () => {
           <AddMonitor resources={[resource]} />
         </Window>
       )}
+      {loading && <LoadingPanel />}
+      <h1>{resource.DisplayName}</h1>
+      <div className="k-card-deck">
+        <Card className="device-detail-card">
+          <CardSubtitle className="device-detail-subtitle">
+            {"Type"}
+          </CardSubtitle>
+          <CardBody>
+            <h1 className="device-detail-h1"> {resource["ResourceType"]}</h1>{" "}
+          </CardBody>
+        </Card>
 
-      <section
-        style={{
-          width: "20%",
-          float: "left",
-        }}
-      >
-        {Object.keys(resource).map((field) => (
-          <p key={field}>
-            {field === "WorstStateInternalID" ||
-            field === "BestStateInternalID" ? (
-              <>
-                {" "}
-                <strong>{field}: </strong>{" "}
-                {getEmojiFromMonitorStatus(resource[field])}{" "}
-              </>
-            ) : (
-              <>
-                {" "}
-                <strong>{field}: </strong> {resource[field]}{" "}
-              </>
-            )}
-          </p>
-        ))}
+        <Card className="device-detail-card">
+          <CardSubtitle className="device-detail-subtitle">{"ID"}</CardSubtitle>
+          <CardBody>
+            <h1 className="device-detail-h1"> {resource["id"]}</h1>{" "}
+          </CardBody>
+        </Card>
 
-        <p>
-          <strong>Maintenance Status: </strong>{" "}
-          {getEmojiFromMonitorStatus(
-            resource.WorstStateInternalID === 2 &&
-              resource.BestStateInternalID === 2
-              ? 2
-              : 3
-          )}
-          <button
-            onClick={() => toggleMaintenanceStatus()}
-            className="k-button k-primary"
-          >
-            Toggle
-          </button>
-        </p>
-      </section>
+        <Card className="device-detail-card">
+          <CardSubtitle className="device-detail-subtitle">
+            {"Host Name"}
+          </CardSubtitle>
+          <CardBody>
+            <h1 className="device-detail-h1"> {resource["DefaultHostName"]}</h1>{" "}
+          </CardBody>
+        </Card>
+      </div>
+      <div className="k-card-deck">
+        <Card className="device-detail-card">
+          <CardSubtitle className="device-detail-subtitle">
+            {"Tenant"}
+          </CardSubtitle>
+          <CardBody>
+            <h1 className="device-detail-h1"> {resource["TenantID"]}</h1>{" "}
+          </CardBody>
+        </Card>
+
+        <Card className="device-detail-card">
+          <CardSubtitle className="device-detail-subtitle">
+            {"Site"}
+          </CardSubtitle>
+          <CardBody>
+            <h1 className="device-detail-h1"> {resource["SiteID"]}</h1>{" "}
+          </CardBody>
+        </Card>
+
+        <Card className="device-detail-card">
+          <CardSubtitle className="device-detail-subtitle">
+            {"Maintenance Status"}
+          </CardSubtitle>
+          <CardBody>
+            <big>
+              <big>
+                {getEmojiFromMonitorStatus(
+                  resource.WorstStateInternalID === 2 &&
+                    resource.BestStateInternalID === 2
+                    ? 2
+                    : 3
+                )}{" "}
+              </big>
+            </big>{" "}
+            <button
+              onClick={() => toggleMaintenanceStatus()}
+              className="k-button k-primary"
+            >
+              Toggle
+            </button>{" "}
+          </CardBody>
+        </Card>
+      </div>
 
       <Grid data={resourceMonitors}>
         <GridToolbar>

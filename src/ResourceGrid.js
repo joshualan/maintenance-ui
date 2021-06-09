@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Grid, GridColumn, GridToolbar } from "@progress/kendo-react-grid";
 import { process } from "@progress/kendo-data-query";
 import { Window } from "@progress/kendo-react-dialogs";
+import { getter } from "@progress/kendo-react-common";
 import { Link } from "react-router-dom";
+import "@progress/kendo-theme-material/dist/all.css";
+
 import { updateMaintenanceStatus } from "./utils/azure";
 import AddMonitor from "./AddMonitor";
-import { getter } from "@progress/kendo-react-common";
-import "@progress/kendo-theme-material/dist/all.css";
+import LoadingPanel from "./LoadingPanel";
 
 const DATA_ITEM_KEY = "Pkey";
 const SELECTED_FIELD = "selected";
@@ -26,20 +28,21 @@ const MaintenanceCell = (props) => {
 };
 
 const ResourceGrid = (props) => {
-  const { resources, sites } = props;
+  const { resources } = props;
   const [dataState, setDataState] = useState({});
   const [result, setResult] = useState(resources || []);
   const [selectedState, setSelectedState] = useState({});
   const [selectedResources, setSelectedResources] = useState([]);
-
   const [addMonitorWindowVisibility, setAddMonitorWindowVisibility] =
     useState(false);
+  const [loading, setLoading] = useState(false);
 
   const toggleAddMonitorWindow = () => {
     setAddMonitorWindowVisibility(!addMonitorWindowVisibility);
   };
 
   async function onToggleBtnClick() {
+    setLoading(true);
     for (const resource of selectedResources) {
       const { TenantID, SiteID, ResourceID } = resource;
 
@@ -62,6 +65,7 @@ const ResourceGrid = (props) => {
         alert(`Failed to update maintenance status of ${resource.DisplayName}`);
       }
     }
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -108,13 +112,14 @@ const ResourceGrid = (props) => {
           title="Add Monitor"
           modal={true}
           onClose={toggleAddMonitorWindow}
-          initialWidth={1500}
-          initialHeight={1200}
+          initialWidth={1000}
+          initialHeight={1000}
           resizable={true}
         >
           <AddMonitor resources={selectedResources} />
         </Window>
       )}
+      {loading && <LoadingPanel />}
       <Grid
         data={result}
         filterable={true}
