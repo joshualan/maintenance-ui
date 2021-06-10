@@ -11,7 +11,7 @@ import "./styles/main.css";
 import "@progress/kendo-theme-material/dist/all.css";
 
 const App = () => {
-  const selection = useState({tenant: "", sites: []});
+  const selection = useState({ tenant: "", sites: [] });
   return (
     <SelectionContext.Provider value={selection}>
       <Router>

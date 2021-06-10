@@ -99,8 +99,8 @@ const ResourceDetails = () => {
           title="Add Monitor"
           modal={true}
           onClose={toggleAddMonitorWindow}
-          initialWidth={1500}
-          initialHeight={1200}
+          initialWidth={1000}
+          initialHeight={1000}
           resizable={true}
         >
           <AddMonitor resources={[resource]} />

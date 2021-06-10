@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { Grid, GridColumn } from "@progress/kendo-react-grid";
+import { Card, CardBody } from "@progress/kendo-react-layout";
+import { Link } from "react-router-dom";
+import { process } from "@progress/kendo-data-query";
+
 import {
   getMonitorsForResource,
   getMonitorsForSite,
   addMonitorToResource,
 } from "./utils/azure";
-import { Grid, GridColumn } from "@progress/kendo-react-grid";
-import { process } from "@progress/kendo-data-query";
 import LoadingPanel from "./LoadingPanel";
 
 const AddMonitor = (props) => {
@@ -162,7 +165,19 @@ const AddMonitor = (props) => {
   return (
     <div>
       {loading && <LoadingPanel />}
-      {TenantID} {SiteID} {resourceNames.join(", ")}
+
+      <h3> Selected Resources </h3>
+      <div className="k-card-group" style={{ "padding-bottom": "20px" }}>
+        {resources.map((resource) => (
+          <Card>
+            <Link
+              to={`/details/${resource.TenantID}/${resource.SiteID}/${resource.ResourceID}`}
+            >
+              <CardBody>{resource.DisplayName}</CardBody>
+            </Link>
+          </Card>
+        ))}
+      </div>
       <Grid
         resizable={true}
         reorderable={true}

@@ -18,15 +18,7 @@ const Resources = () => {
   const [selection, setSelection] = useContext(SelectionContext);
 
   useEffect(() => {
-    requestTenants();
-
-    if (selection.tenant) {
-      setTenant(selection.tenant);
-    }
-
-    if (selection.sites.length > 0) {
-      setSites(selection.sites);
-    }
+    initialize();
   }, []);
 
   useEffect(() => {
@@ -37,6 +29,16 @@ const Resources = () => {
     setResources([]);
     requestResources();
   }, [sites]);
+
+  async function initialize() {
+    await requestTenants();
+    if (selection.tenant) {
+      setTenant(selection.tenant);
+    }
+    if (selection.sites.length > 0) {
+      setSites(selection.sites);
+    }
+  }
 
   async function requestTenants() {
     const json = await getTenantsAndSites();
@@ -67,13 +69,12 @@ const Resources = () => {
 
   const handleTenantChange = (event) => {
     setTenant(event.target.value);
-    setSelection({ tenant: event.target.value, sites: selection.sites })
-
+    setSelection({ tenant: event.target.value, sites: selection.sites });
   };
 
   const handleSiteChange = (event) => {
     setSites(event.target.value);
-    setSelection({ tenant: tenant, sites: event.target.value })
+    setSelection({ tenant: tenant, sites: event.target.value });
   };
 
   return (
@@ -81,7 +82,6 @@ const Resources = () => {
       {loading && <LoadingPanel />}
       <Card>
         <CardBody>
-
           <Form
             className="k-form"
             onSubmit={requestResources}
