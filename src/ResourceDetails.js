@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { Grid, GridColumn, GridToolbar } from "@progress/kendo-react-grid";
 import { Window } from "@progress/kendo-react-dialogs";
-import { Card, CardBody, CardSubtitle, CardTitle } from "@progress/kendo-react-layout";
+import {
+  Card,
+  CardBody,
+  CardSubtitle,
+  CardTitle,
+} from "@progress/kendo-react-layout";
 
 import {
   getMonitorsForResource,
@@ -40,26 +45,6 @@ const ResourceDetails = () => {
       requestMonitors();
     }
   };
-
-  async function toggleMaintenanceStatus() {
-    const { BestStateInternalID, WorstStateInternalID } = resource;
-    const status = WorstStateInternalID === 2 && BestStateInternalID === 2;
-
-    setLoading(true);
-    const json = await updateMaintenanceStatus(
-      tenantID,
-      siteID,
-      resourceID,
-      !status
-    );
-
-    if (json.data.success) {
-      alert("Maintenance Status is now: " + !status);
-    } else {
-      alert("Failed to update maintenance status");
-    }
-    setLoading(false);
-  }
 
   async function requestMonitors() {
     setLoading(true);
@@ -103,12 +88,8 @@ const ResourceDetails = () => {
       )}
       {loading && <LoadingPanel />}
       <Card>
-        <CardTitle>
-        {resource.DisplayName}
-        </CardTitle>
-        <CardSubtitle>
-          Display Name
-        </CardSubtitle>
+        <CardTitle>{resource.DisplayName}</CardTitle>
+        <CardSubtitle>Display Name</CardSubtitle>
         <CardBody>
           <Grid data={resourceMonitors}>
             <GridToolbar>

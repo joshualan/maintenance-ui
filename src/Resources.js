@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { DropDownList, MultiSelect } from "@progress/kendo-react-dropdowns";
 import { Form, FormElement } from "@progress/kendo-react-form";
 import { Card, CardBody } from "@progress/kendo-react-layout";
 import ResourceGrid from "./ResourceGrid";
 import LoadingPanel from "./LoadingPanel";
+import SelectionContext from "./SelectionContext";
 import { getTenantsAndSites, getResources } from "./utils/azure";
 
 const Resources = () => {
@@ -14,9 +15,18 @@ const Resources = () => {
   const [sitesList, setSitesList] = useState([]);
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selection, setSelection] = useContext(SelectionContext);
 
   useEffect(() => {
     requestTenants();
+
+    if (selection.tenant) {
+      setTenant(selection.tenant);
+    }
+
+    if (selection.sites.length > 0) {
+      setSites(selection.sites);
+    }
   }, []);
 
   useEffect(() => {
@@ -57,10 +67,13 @@ const Resources = () => {
 
   const handleTenantChange = (event) => {
     setTenant(event.target.value);
+    setSelection({ tenant: event.target.value, sites: selection.sites })
+
   };
 
   const handleSiteChange = (event) => {
     setSites(event.target.value);
+    setSelection({ tenant: tenant, sites: event.target.value })
   };
 
   return (
@@ -68,6 +81,7 @@ const Resources = () => {
       {loading && <LoadingPanel />}
       <Card>
         <CardBody>
+
           <Form
             className="k-form"
             onSubmit={requestResources}
@@ -77,6 +91,7 @@ const Resources = () => {
                   label="Tenant"
                   name="tenant"
                   data={tenantsList}
+                  value={tenant}
                   required={true}
                   onChange={handleTenantChange}
                 />
@@ -85,6 +100,7 @@ const Resources = () => {
                   name="site"
                   data={sitesList}
                   required={true}
+                  value={sites}
                   onChange={handleSiteChange}
                 />
               </FormElement>

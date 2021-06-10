@@ -1,17 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import Resources from "./Resources";
 import ResourceDetails from "./ResourceDetails";
 import Header from "./Header";
+import SelectionContext from "./SelectionContext";
 
 import "./styles/main.css";
 import "@progress/kendo-theme-material/dist/all.css";
 
 const App = () => {
+  const selection = useState({tenant: "", sites: []});
   return (
-    <>
+    <SelectionContext.Provider value={selection}>
       <Router>
         <Switch>
           <Route path="/details/:tenantID/:siteID/:resourceID">
@@ -28,7 +30,7 @@ const App = () => {
           </Route>
         </Switch>
       </Router>
-    </>
+    </SelectionContext.Provider>
   );
 };
 
