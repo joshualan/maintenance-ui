@@ -138,7 +138,7 @@ const ResourceGrid = (props) => {
         <GridToolbar>
           <button
             title="Toggle"
-            className="k-button k-primary"
+            className="k-button"
             onClick={onToggleBtnClick}
             disabled={selectedResources.length < 1}
           >
@@ -146,7 +146,7 @@ const ResourceGrid = (props) => {
           </button>
           <button
             title="massAssignMonitors"
-            className="k-button k-primary"
+            className="k-button"
             onClick={toggleAddMonitorWindow}
             disabled={selectedResources.length < 1}
           >

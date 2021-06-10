@@ -2,13 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { Grid, GridColumn, GridToolbar } from "@progress/kendo-react-grid";
 import { Window } from "@progress/kendo-react-dialogs";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardBody,
-  CardSubtitle,
-} from "@progress/kendo-react-layout";
+import { Card, CardBody, CardSubtitle, CardTitle } from "@progress/kendo-react-layout";
 
 import {
   getMonitorsForResource,
@@ -108,8 +102,41 @@ const ResourceDetails = () => {
         </Window>
       )}
       {loading && <LoadingPanel />}
-      <h1>{resource.DisplayName}</h1>
-      <div className="k-card-deck">
+      <Card>
+        <CardTitle>
+        {resource.DisplayName}
+        </CardTitle>
+        <CardSubtitle>
+          Display Name
+        </CardSubtitle>
+        <CardBody>
+          <Grid data={resourceMonitors}>
+            <GridToolbar>
+              <button
+                title="Add Monitor"
+                className="k-button k-primary"
+                onClick={toggleAddMonitorWindow}
+              >
+                Add Monitor
+              </button>
+            </GridToolbar>
+            <GridColumn
+              field="MonitorDisplayName"
+              title="Monitor Display Name"
+            />
+            <GridColumn
+              field="MonitorDescription"
+              title="Monitor Description"
+            />
+            <GridColumn
+              field="MonitorInternalStateID"
+              title="Monitor Internal State ID"
+              cell={MonitorStatusCell}
+            />
+          </Grid>
+        </CardBody>
+      </Card>
+      {/* <div className="k-card-deck">
         <Card className="device-detail-card">
           <CardSubtitle className="device-detail-subtitle">
             {"Type"}
@@ -177,26 +204,7 @@ const ResourceDetails = () => {
             </button>{" "}
           </CardBody>
         </Card>
-      </div>
-
-      <Grid data={resourceMonitors}>
-        <GridToolbar>
-          <button
-            title="Add Monitor"
-            className="k-button k-primary"
-            onClick={toggleAddMonitorWindow}
-          >
-            Add Monitor
-          </button>
-        </GridToolbar>
-        <GridColumn field="MonitorDisplayName" title="Monitor Display Name" />
-        <GridColumn field="MonitorDescription" title="Monitor Description" />
-        <GridColumn
-          field="MonitorInternalStateID"
-          title="Monitor Internal State ID"
-          cell={MonitorStatusCell}
-        />
-      </Grid>
+      </div> */}
     </>
   );
 };

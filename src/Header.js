@@ -9,8 +9,8 @@ import {
 const Header = (props) => {
   const { page } = props;
   return (
-    <>
-      <AppBar themeColor="light">
+    <div className="appbar">
+      <AppBar themeColor="inherit">
         <AppBarSection>
           <button className="k-button hamburger-button k-button-clear">
             <span className="k-icon k-i-menu" />
@@ -22,9 +22,8 @@ const Header = (props) => {
             width: 1,
           }}
         />
-
         <AppBarSection>
-          <Link to="/" style={{ textDecoration: "none" }}>
+          <Link to="/" className="header-link">
             <h1 className="title">WhatsUp Gold PoC</h1>
           </Link>
         </AppBarSection>
@@ -52,14 +51,7 @@ const Header = (props) => {
           </button>
         </AppBarSection> */}
       </AppBar>
-      <style>{`
-        .title {
-          font-size: 18px;
-          margin: 0;
-        }
-        .hamburger-button { padding: 0; }
-      `}</style>
-    </>
+    </div>
   );
 };
 

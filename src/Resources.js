@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { DropDownList, MultiSelect } from "@progress/kendo-react-dropdowns";
 import { Form, FormElement } from "@progress/kendo-react-form";
-
+import { Card, CardBody } from "@progress/kendo-react-layout";
 import ResourceGrid from "./ResourceGrid";
 import LoadingPanel from "./LoadingPanel";
 import { getTenantsAndSites, getResources } from "./utils/azure";
@@ -66,30 +66,34 @@ const Resources = () => {
   return (
     <div className="search-params">
       {loading && <LoadingPanel />}
-      <Form
-        className="k-form"
-        onSubmit={requestResources}
-        render={() => (
-          <FormElement>
-            <DropDownList
-              label="Tenant"
-              name="tenant"
-              data={tenantsList}
-              required={true}
-              onChange={handleTenantChange}
-            />
-            <MultiSelect
-              label="Site"
-              name="site"
-              data={sitesList}
-              required={true}
-              onChange={handleSiteChange}
-            />
-          </FormElement>
-        )}
-      />
+      <Card>
+        <CardBody>
+          <Form
+            className="k-form"
+            onSubmit={requestResources}
+            render={() => (
+              <FormElement>
+                <DropDownList
+                  label="Tenant"
+                  name="tenant"
+                  data={tenantsList}
+                  required={true}
+                  onChange={handleTenantChange}
+                />
+                <MultiSelect
+                  label="Site"
+                  name="site"
+                  data={sitesList}
+                  required={true}
+                  onChange={handleSiteChange}
+                />
+              </FormElement>
+            )}
+          />
 
-      <ResourceGrid resources={resources} sites={sites}></ResourceGrid>
+          <ResourceGrid resources={resources} sites={sites}></ResourceGrid>
+        </CardBody>
+      </Card>
     </div>
   );
 };

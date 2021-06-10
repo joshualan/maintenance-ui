@@ -6,7 +6,7 @@ import Resources from "./Resources";
 import ResourceDetails from "./ResourceDetails";
 import Header from "./Header";
 
-import "./styles/something.css";
+import "./styles/main.css";
 import "@progress/kendo-theme-material/dist/all.css";
 
 const App = () => {
