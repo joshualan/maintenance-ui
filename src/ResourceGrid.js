@@ -7,24 +7,24 @@ import { Link } from "react-router-dom";
 import "@progress/kendo-theme-material/dist/all.css";
 
 import { updateMaintenanceStatus } from "./utils/azure";
+import { getEmojiFromMonitorStatus } from "./utils/emoji"; 
 import AddMonitor from "./AddMonitor";
 import LoadingPanel from "./LoadingPanel";
-
 const DATA_ITEM_KEY = "Pkey";
 const SELECTED_FIELD = "selected";
 const idGetter = getter(DATA_ITEM_KEY);
 const MaintenanceCell = (props) => {
   const { dataItem } = props;
-  let inMaintenance = false;
+  let status = 3;
 
   if (
-    dataItem.WorstStateInternalID === 2 ||
+    dataItem.WorstStateInternalID === 2 &&
     dataItem.BestStateInternalID === 2
   ) {
-    inMaintenance = true;
+    status = 2;
   }
 
-  return <td>{inMaintenance ? "In Maintenance " : "Not In Maintenance "}</td>;
+  return <td>{getEmojiFromMonitorStatus(status)}</td>;
 };
 
 const ResourceGrid = (props) => {
@@ -175,7 +175,7 @@ const ResourceGrid = (props) => {
         />
         <GridColumn field="ResourceID" title="Resource ID" />
         <GridColumn field="DefaultIPAddress" title="IP Address" />
-        <GridColumn title="Maintenance Status" cell={MaintenanceCell} />
+        <GridColumn title="Maintenance Status" width="175px" cell={MaintenanceCell} />
       </Grid>
     </>
   );

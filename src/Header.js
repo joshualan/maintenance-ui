@@ -4,24 +4,23 @@ import {
   AppBar,
   AppBarSection,
   AppBarSpacer,
+  Avatar
 } from "@progress/kendo-react-layout";
+import { Badge, BadgeContainer } from "@progress/kendo-react-indicators";
 
+let edAvatar =
+  "https://media-exp3.licdn.com/dms/image/C4D03AQGNHCbhjTLNRQ/profile-displayphoto-shrink_200_200/0/1516275449454?e=1629331200&v=beta&t=LVgmJ_zpsbZGYRsY6OeltWocprkzJK-CSzLQjJSl5cs";
 const Header = (props) => {
   const { page } = props;
   return (
     <div className="appbar">
       <AppBar themeColor="inherit">
         <AppBarSection>
-          <button className="k-button hamburger-button k-button-clear">
-            <span className="k-icon k-i-menu" />
-          </button>
+          {/* <button className="k-button k-button-clear"> */}
+            {/* <span className="k-icon k-i-menu" /> */}
+            <img src="https://progresssoftware.sharepoint.com/sites/MyProgress-Marketing/Shared%20Documents/Progress%20Corporate%20Logo/Digital%20-%20RGB/Primary%20Logos%20&%20Symbol%20-%20Color/PNG/Progress_PrimarySymbol.png" style={{"max-width": "40px", "padding": "0px", "margin": "0px"}} />
+          {/* </button> */}
         </AppBarSection>
-
-        <AppBarSpacer
-          style={{
-            width: 1,
-          }}
-        />
         <AppBarSection>
           <Link to="/" className="header-link">
             <h1 className="title">WhatsUp Gold PoC</h1>
@@ -36,20 +35,29 @@ const Header = (props) => {
 
         <AppBarSpacer />
 
-        {/* <AppBarSection className="social-section">
+        {/* "k-icon k-i-question" */}
+
+        <AppBarSection >
           <button className="k-button k-button-clear">
-            <span className="k-icon k-i-facebook" />
+            <BadgeContainer>
+              <span className="k-icon k-i-question" />
+              <Badge
+                shape="dot"
+                themeColor="info"
+                size="small"
+                position="inside"
+              />
+            </BadgeContainer>
           </button>
-          <button className="k-button k-button-clear">
-            <span className="k-icon k-i-twitter" />
-          </button>
-          <button className="k-button k-button-clear">
-            <span className="k-icon k-i-pinterest" />
-          </button>
-          <button className="k-button k-button-clear">
-            <span className="k-icon k-i-google-plus" />
-          </button>
-        </AppBarSection> */}
+        </AppBarSection>
+
+        <span className="k-appbar-separator" />
+
+        <AppBarSection>
+          <Avatar shape="circle" type="image">
+            <img src={edAvatar} />
+          </Avatar>
+        </AppBarSection>
       </AppBar>
     </div>
   );
