@@ -6,7 +6,6 @@ import {
   AppBarSpacer,
   Avatar
 } from "@progress/kendo-react-layout";
-import { Badge, BadgeContainer } from "@progress/kendo-react-indicators";
 
 let edAvatar =
   "https://media-exp3.licdn.com/dms/image/C4D03AQGNHCbhjTLNRQ/profile-displayphoto-shrink_200_200/0/1516275449454?e=1629331200&v=beta&t=LVgmJ_zpsbZGYRsY6OeltWocprkzJK-CSzLQjJSl5cs";
@@ -18,7 +17,7 @@ const Header = (props) => {
         <AppBarSection>
           {/* <button className="k-button k-button-clear"> */}
             {/* <span className="k-icon k-i-menu" /> */}
-            <img src="https://progresssoftware.sharepoint.com/sites/MyProgress-Marketing/Shared%20Documents/Progress%20Corporate%20Logo/Digital%20-%20RGB/Primary%20Logos%20&%20Symbol%20-%20Color/PNG/Progress_PrimarySymbol.png" style={{"max-width": "40px", "padding": "0px", "margin": "0px"}} />
+            <img src="https://chriscamicas.gallerycdn.vsassets.io/extensions/chriscamicas/openedge-abl/1.2.0/1587754986999/Microsoft.VisualStudio.Services.Icons.Default" style={{"max-width": "30px", "padding": "0px", "margin": "0px"}} />
           {/* </button> */}
         </AppBarSection>
         <AppBarSection>
@@ -38,17 +37,12 @@ const Header = (props) => {
         {/* "k-icon k-i-question" */}
 
         <AppBarSection >
-          <button className="k-button k-button-clear">
-            <BadgeContainer>
-              <span className="k-icon k-i-question" />
-              <Badge
-                shape="dot"
-                themeColor="info"
-                size="small"
-                position="inside"
-              />
-            </BadgeContainer>
-          </button>
+          <Link to="/PowerBi">
+            <Avatar shape="circle" type="image">
+            <img src="https://i.imgur.com/RmRz9QL.jpg" style={{"max-width": "50px"}} />
+
+          </Avatar>
+          </Link>
         </AppBarSection>
 
         <span className="k-appbar-separator" />

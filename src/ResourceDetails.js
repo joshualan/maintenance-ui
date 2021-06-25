@@ -111,6 +111,25 @@ const ResourceDetails = () => {
         <CardTitle>{resource.DisplayName}</CardTitle>
         <CardSubtitle>Display Name</CardSubtitle>
         <CardBody>
+          <div className="details-wrapper"> 
+            <div className="col-1">
+              <strong>Default Host Name</strong>: {resource.DefaultHostName} <br />
+              <strong>Default IP Address</strong>: {resource.DefaultIPAddress}
+            </div>
+
+            <div className="col-2">
+              <strong>Resource Type</strong>: {resource.ResourceType} <br />
+              <strong>Resource ID</strong>: {resource.ResourceID}
+            </div>
+
+            <div className="col-3">
+              <strong>Site</strong>: {resource.SiteID} <br />
+              <strong>Tenant</strong>: {resource.TenantID}
+            </div>
+          
+          </div>
+
+
           <Grid data={resourceMonitors}>
             <GridToolbar>
               <button
